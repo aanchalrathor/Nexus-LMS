@@ -17,6 +17,26 @@ import {
   Settings, Lock, Eye, EyeOff, PlusCircle, Trash2, Edit3, DollarSign,
   AlertCircle, Shield, User, Bell, ExternalLink, Printer, Check, X
 } from 'lucide-react';
+import { motion, MotionConfig } from 'framer-motion';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
+};
+
+const staggerContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12 } }
+};
+
+const viewportOnce = { once: true, margin: '-80px' };
+
+const homeMetrics = [
+  { value: '95.4%', label: 'Placement Success', sub: 'Within 180 days' },
+  { value: '$114,000', label: 'Avg Starting Package', sub: '2025-2026 cohorts' },
+  { value: '140+', label: 'Hiring Partners', sub: 'Tier-one tech employers' },
+  { value: '4.92 / 5', label: 'Faculty Rating', sub: 'From 4,800+ evaluations' }
+];
 
 export default function App() {
   const { currentView, userRole } = useApp();
@@ -29,13 +49,22 @@ export default function App() {
   const isAdminView = currentView.startsWith('admin-');
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className="min-h-screen flex flex-col bg-ivory-50 text-charcoal-900 font-sans selection:bg-forest-800 selection:text-white">
       <Toast />
 
       {/* AUTH VIEW LAYOUT */}
       {isAuthView ? (
         <main className="flex-1 flex items-center justify-center p-4 sm:p-6 bg-gradient-to-b from-ivory-100 to-ivory-50">
-          <AuthRouter view={currentView} />
+          <motion.div
+            key={currentView}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
+            className="w-full flex justify-center"
+          >
+            <AuthRouter view={currentView} />
+          </motion.div>
         </main>
       ) : isStudentView ? (
         /* STUDENT PORTAL LAYOUT */
@@ -100,13 +129,20 @@ export default function App() {
         /* PUBLIC SITE LAYOUT */
         <div className="flex-1 flex flex-col">
           <PublicNavbar />
-          <main className="flex-1">
+          <motion.main
+            key={currentView}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
+            className="flex-1"
+          >
             <PublicRouter view={currentView} />
-          </main>
+          </motion.main>
           <PublicFooter />
         </div>
       )}
     </div>
+    </MotionConfig>
   );
 }
 
@@ -127,146 +163,169 @@ function PublicRouter({ view }) {
 }
 
 function PublicHome() {
-  const { courses, navigateTo, enrollCourse, placements } = useApp();
+  const { courses, navigateTo, enrollCourse, placements, gallery, userRole } = useApp();
   const featured = courses.slice(0, 3);
+  const isAuthenticated = userRole !== 'public';
 
   return (
-    <div className="space-y-16 pb-16">
+    <div>
       {/* Hero */}
-      <section className="relative overflow-hidden pt-10 pb-16 lg:pt-16 lg:pb-24 bg-gradient-to-b from-ivory-100/70 to-ivory-50 border-b border-ivory-200">
+      <section className="relative overflow-hidden pt-14 pb-20 lg:pt-24 lg:pb-28 bg-gradient-to-b from-ivory-100/70 to-ivory-50 border-b border-ivory-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            <div className="lg:col-span-7 space-y-5">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-forest-50 border border-forest-200 text-forest-800 text-xs font-semibold">
+          <div className={`grid grid-cols-1 items-center gap-12 lg:gap-10 ${isAuthenticated ? 'lg:grid-cols-12' : ''}`}>
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              animate="show"
+              className={`space-y-6 ${isAuthenticated ? 'lg:col-span-7' : 'mx-auto max-w-3xl text-center'}`}
+            >
+              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-forest-50 border border-forest-200 text-forest-800 text-xs font-semibold">
                 <span className="w-2 h-2 rounded-full bg-forest-600 animate-pulse"></span>
                 <span>Fall 2026 Academic Cohorts Now Open</span>
-              </div>
-              <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-forest-950 leading-[1.14]">
+              </motion.div>
+              <motion.h1 variants={fadeUp} className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-forest-950 leading-[1.1]">
                 Architecting Real-World <span className="italic font-normal text-forest-800">Engineering</span> & Applied Systems.
-              </h1>
-              <p className="text-base text-charcoal-600 leading-relaxed max-w-2xl">
+              </motion.h1>
+              <motion.p variants={fadeUp} className={`text-base sm:text-lg text-charcoal-600 leading-relaxed max-w-2xl ${isAuthenticated ? '' : 'mx-auto'}`}>
                 Nexus LMS brings together structured institutional curricula, direct industry mentorship, and verified credentials. Built for students committed to software engineering, design systems, and data infrastructure.
-              </p>
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <button
+              </motion.p>
+              <motion.div variants={fadeUp} className={`flex flex-wrap items-center gap-3 pt-2 ${isAuthenticated ? '' : 'justify-center'}`}>
+                <motion.button
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => navigateTo('courses')}
-                  className="px-6 py-3 rounded-xl bg-forest-800 hover:bg-forest-900 text-white font-medium text-sm shadow-md transition-all flex items-center gap-2 group"
+                  className="px-6 py-3 rounded-xl bg-forest-800 hover:bg-forest-900 text-white font-medium text-sm shadow-md transition-colors flex items-center gap-2 group"
                 >
                   <span>Explore Academic Programs</span>
                   <ArrowRight className="w-4 h-4 text-gold-400 group-hover:translate-x-1 transition-transform" />
-                </button>
-                <button
+                </motion.button>
+                <motion.button
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => navigateTo('signup')}
                   className="px-6 py-3 rounded-xl border border-forest-800/20 bg-white hover:bg-ivory-100 text-forest-900 font-medium text-sm transition-colors"
                 >
                   Create Student Account
-                </button>
-              </div>
-              <div className="pt-4 border-t border-ivory-200/80 flex flex-wrap items-center gap-6 text-xs text-charcoal-600 font-medium">
+                </motion.button>
+              </motion.div>
+              <motion.div variants={fadeUp} className={`pt-5 border-t border-ivory-200/80 flex flex-wrap items-center gap-6 text-xs sm:text-sm text-charcoal-600 font-medium ${isAuthenticated ? '' : 'justify-center'}`}>
                 <div className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-forest-700" /><span>ABET Aligned</span></div>
                 <div className="flex items-center gap-2"><Award className="w-4 h-4 text-gold-600" /><span>Verified Credentials</span></div>
                 <div className="flex items-center gap-2"><TrendingUp className="w-4 h-4 text-forest-700" /><span>95.4% Placement Rate</span></div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
-            <div className="lg:col-span-5 relative">
-              <div className="relative mx-auto max-w-md rounded-2xl bg-white p-5 sm:p-6 shadow-xl border border-ivory-200 space-y-4">
-                <div className="flex items-center justify-between border-b border-ivory-100 pb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-forest-800"></div>
-                    <span className="text-xs font-bold text-forest-900 uppercase tracking-wider">Live Learning Cohort</span>
-                  </div>
-                  <span className="text-[11px] bg-forest-50 text-forest-800 font-semibold px-2 py-0.5 rounded-full border border-forest-200">Active</span>
-                </div>
-                <div className="rounded-xl overflow-hidden border border-ivory-200 bg-ivory-50/50">
-                  <img
-                    src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80"
-                    alt="Course Preview"
-                    className="w-full h-40 object-cover"
-                  />
-                  <div className="p-4 space-y-2">
-                    <span className="text-[10px] font-bold text-gold-600 uppercase tracking-wider">Software Engineering</span>
-                    <h3 className="font-semibold text-sm text-charcoal-900 leading-snug">Full-Stack Web Engineering with React & Node</h3>
-                    <div className="flex items-center justify-between text-xs text-charcoal-500 pt-1">
-                      <span>Module 2: State Machines</span>
-                      <span className="font-medium text-forest-800">68% Complete</span>
+            {isAuthenticated && (
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: 'easeOut', delay: 0.25 }}
+                className="lg:col-span-5 relative"
+              >
+                <div className="relative mx-auto max-w-md rounded-2xl bg-white p-5 sm:p-6 shadow-xl border border-ivory-200 space-y-4">
+                  <div className="flex items-center justify-between border-b border-ivory-100 pb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-full bg-forest-800"></div>
+                      <span className="text-xs font-bold text-forest-900 uppercase tracking-wider">Live Learning Cohort</span>
                     </div>
-                    <div className="w-full bg-ivory-200 h-2 rounded-full overflow-hidden">
-                      <div className="bg-forest-700 h-full rounded-full" style={{ width: '68%' }}></div>
+                    <span className="text-[11px] bg-forest-50 text-forest-800 font-semibold px-2 py-0.5 rounded-full border border-forest-200">Active</span>
+                  </div>
+                  <div className="rounded-xl overflow-hidden border border-ivory-200 bg-ivory-50/50">
+                    <img
+                      src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80"
+                      alt="Course Preview"
+                      className="w-full h-40 object-cover"
+                    />
+                    <div className="p-4 space-y-2">
+                      <span className="text-[10px] font-bold text-gold-600 uppercase tracking-wider">Software Engineering</span>
+                      <h3 className="font-semibold text-sm text-charcoal-900 leading-snug">Full-Stack Web Engineering with React & Node</h3>
+                      <div className="flex items-center justify-between text-xs text-charcoal-500 pt-1">
+                        <span>Module 2: State Machines</span>
+                        <span className="font-medium text-forest-800">68% Complete</span>
+                      </div>
+                      <div className="w-full bg-ivory-200 h-2 rounded-full overflow-hidden">
+                        <div className="bg-forest-700 h-full rounded-full" style={{ width: '68%' }}></div>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3 text-center">
-                  <div className="p-2.5 rounded-xl bg-ivory-50 border border-ivory-200">
-                    <p className="text-lg font-bold font-serif text-forest-900">42</p>
-                    <p className="text-[11px] text-charcoal-500">Structured Lessons</p>
+                  <div className="grid grid-cols-2 gap-3 text-center">
+                    <div className="p-2.5 rounded-xl bg-ivory-50 border border-ivory-200">
+                      <p className="text-lg font-bold font-serif text-forest-900">42</p>
+                      <p className="text-[11px] text-charcoal-500">Structured Lessons</p>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-ivory-50 border border-ivory-200">
+                      <p className="text-lg font-bold font-serif text-forest-900">1:1</p>
+                      <p className="text-[11px] text-charcoal-500">Faculty Mentorship</p>
+                    </div>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-ivory-50 border border-ivory-200">
-                    <p className="text-lg font-bold font-serif text-forest-900">1:1</p>
-                    <p className="text-[11px] text-charcoal-500">Faculty Mentorship</p>
-                  </div>
+                  <button
+                    onClick={() => navigateTo('course-overview', { courseId: 'cs-101' })}
+                    className="w-full py-2.5 rounded-lg bg-forest-900 hover:bg-forest-950 text-white font-medium text-xs shadow transition-colors flex items-center justify-center gap-1.5"
+                  >
+                    <span>Preview Course Syllabus & Player</span>
+                    <ChevronRight className="w-4 h-4 text-gold-400" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => navigateTo('course-overview', { courseId: 'cs-101' })}
-                  className="w-full py-2.5 rounded-lg bg-forest-900 hover:bg-forest-950 text-white font-medium text-xs shadow transition-colors flex items-center justify-center gap-1.5"
-                >
-                  <span>Preview Course Syllabus & Player</span>
-                  <ChevronRight className="w-4 h-4 text-gold-400" />
-                </button>
-              </div>
-            </div>
+              </motion.div>
+            )}
           </div>
         </div>
       </section>
 
       {/* Metrics Row */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <motion.section
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20"
+      >
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-          <div className="p-5 rounded-2xl bg-white border border-ivory-200 text-center shadow-sm">
-            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-forest-900">95.4%</h3>
-            <p className="text-xs font-semibold text-charcoal-700 uppercase tracking-wide mt-1">Placement Success</p>
-            <p className="text-[11px] text-charcoal-500">Within 180 days</p>
-          </div>
-          <div className="p-5 rounded-2xl bg-white border border-ivory-200 text-center shadow-sm">
-            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-forest-900">$114,000</h3>
-            <p className="text-xs font-semibold text-charcoal-700 uppercase tracking-wide mt-1">Avg Starting Package</p>
-            <p className="text-[11px] text-charcoal-500">2025-2026 cohorts</p>
-          </div>
-          <div className="p-5 rounded-2xl bg-white border border-ivory-200 text-center shadow-sm">
-            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-forest-900">140+</h3>
-            <p className="text-xs font-semibold text-charcoal-700 uppercase tracking-wide mt-1">Hiring Partners</p>
-            <p className="text-[11px] text-charcoal-500">Tier-one tech employers</p>
-          </div>
-          <div className="p-5 rounded-2xl bg-white border border-ivory-200 text-center shadow-sm">
-            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-forest-900">4.92 / 5</h3>
-            <p className="text-xs font-semibold text-charcoal-700 uppercase tracking-wide mt-1">Faculty Rating</p>
-            <p className="text-[11px] text-charcoal-500">From 4,800+ evaluations</p>
-          </div>
+          {homeMetrics.map((m) => (
+            <motion.div
+              key={m.label}
+              variants={fadeUp}
+              whileHover={{ y: -4 }}
+              className="p-6 rounded-2xl bg-white border border-ivory-200 text-center shadow-sm"
+            >
+              <h3 className="font-serif text-2xl sm:text-3xl font-bold text-forest-900">{m.value}</h3>
+              <p className="text-xs sm:text-sm font-semibold text-charcoal-700 uppercase tracking-wide mt-1.5">{m.label}</p>
+              <p className="text-[11px] sm:text-xs text-charcoal-500 mt-0.5">{m.sub}</p>
+            </motion.div>
+          ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* Featured Courses */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
-          <div>
-            <span className="text-xs font-bold text-gold-600 uppercase tracking-wider">Curriculum Excellence</span>
-            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-forest-950 mt-1">Featured Academic Courses</h2>
-            <p className="text-xs sm:text-sm text-charcoal-600 mt-1">Taught directly by senior practitioners with architectural experience.</p>
+      <motion.section
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 lg:pb-24"
+      >
+        <motion.div variants={fadeUp} className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+          <div className="space-y-2">
+            <span className="text-xs font-bold text-gold-600 uppercase tracking-widest">Curriculum Excellence</span>
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-forest-950 leading-tight">Featured Academic Courses</h2>
+            <p className="text-sm sm:text-base text-charcoal-600 leading-relaxed">Taught directly by senior practitioners with architectural experience.</p>
           </div>
           <button
             onClick={() => navigateTo('courses')}
-            className="text-xs font-bold text-forest-800 hover:text-forest-900 flex items-center gap-1 group"
+            className="text-sm font-bold text-forest-800 hover:text-forest-900 flex items-center gap-1 group flex-shrink-0"
           >
             <span>View All Programs ({courses.length})</span>
             <ArrowRight className="w-4 h-4 text-gold-500 group-hover:translate-x-1 transition-transform" />
           </button>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {featured.map((course) => (
-            <div
+            <motion.div
               key={course.id}
-              className="group bg-white rounded-2xl border border-ivory-200 overflow-hidden shadow-sm hover:shadow-md hover:border-forest-300 transition-all flex flex-col justify-between"
+              variants={fadeUp}
+              whileHover={{ y: -6 }}
+              className="group bg-white rounded-2xl border border-ivory-200 overflow-hidden shadow-sm hover:shadow-lg hover:border-forest-300 transition-[box-shadow,border-color] duration-300 flex flex-col justify-between"
             >
               <div>
                 <div className="relative overflow-hidden">
@@ -284,28 +343,28 @@ function PublicHome() {
                     <span>{course.rating}</span>
                   </div>
                 </div>
-                <div className="p-5 space-y-3">
+                <div className="p-5 sm:p-6 space-y-3">
                   <div className="flex items-center gap-3 text-xs text-charcoal-500">
                     <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-forest-700" /> {course.duration}</span>
                     <span className="flex items-center gap-1"><BookOpen className="w-3.5 h-3.5 text-forest-700" /> {course.lessonsCount} Lessons</span>
                     <span className="px-2 py-0.5 rounded bg-ivory-100 text-charcoal-700 font-medium">{course.level}</span>
                   </div>
-                  <h3 className="font-serif font-bold text-base text-charcoal-900 leading-snug line-clamp-2">
+                  <h3 className="font-serif font-bold text-base sm:text-lg text-charcoal-900 leading-snug line-clamp-2">
                     {course.title}
                   </h3>
-                  <p className="text-xs text-charcoal-600 line-clamp-2 leading-relaxed">
+                  <p className="text-sm text-charcoal-600 line-clamp-2 leading-relaxed">
                     {course.description}
                   </p>
-                  <div className="flex items-center gap-2.5 pt-2 border-t border-ivory-100">
-                    <img src={course.instructor.avatar} alt={course.instructor.name} className="w-7 h-7 rounded-full object-cover border border-ivory-300" />
+                  <div className="flex items-center gap-2.5 pt-3 border-t border-ivory-100">
+                    <img src={course.instructor.avatar} alt={course.instructor.name} className="w-8 h-8 rounded-full object-cover border border-ivory-300" />
                     <div className="overflow-hidden">
                       <p className="text-xs font-semibold text-charcoal-900 truncate">{course.instructor.name}</p>
-                      <p className="text-[10px] text-charcoal-500 truncate">{course.instructor.title}</p>
+                      <p className="text-[11px] text-charcoal-500 truncate">{course.instructor.title}</p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="p-5 pt-0 border-t border-ivory-100 flex items-center justify-between gap-3 mt-3">
+              <div className="p-5 sm:p-6 pt-4 border-t border-ivory-100 flex items-center justify-between gap-3 mt-3">
                 <div>
                   <span className="text-[10px] text-charcoal-500 uppercase tracking-wider block">Tuition</span>
                   <span className="font-bold text-base text-forest-900">${course.price}</span>
@@ -325,26 +384,203 @@ function PublicHome() {
                   </button>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
-      {/* Partners Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-1 mb-6">
-          <span className="text-xs font-bold text-gold-600 uppercase tracking-wider">Placement Network</span>
-          <h2 className="font-serif text-2xl font-bold text-forest-950">Where Our Scholars Build</h2>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 items-center">
-          {placements.partners.map((partner) => (
-            <div key={partner.name} className="p-3.5 rounded-xl bg-white border border-ivory-200 text-center hover:border-forest-300 transition-colors shadow-sm">
-              <span className="font-semibold text-xs text-charcoal-800 block truncate">{partner.logoText}</span>
-              <span className="text-[10px] text-charcoal-400 block truncate mt-0.5">{partner.role}</span>
+      {/* Academic Philosophy */}
+      <motion.section
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="border-y border-ivory-200 bg-white py-16 lg:py-24"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <motion.div variants={fadeUp} className="space-y-6">
+            <span className="text-xs font-bold text-gold-600 uppercase tracking-widest">The Academic Philosophy</span>
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-forest-950 leading-tight">
+              Education Grounded in Systems Architecture, Not Transient Syntax.
+            </h2>
+            <p className="text-sm sm:text-base text-charcoal-600 leading-relaxed">
+              Founded by senior engineering leaders and academic researchers, Nexus LMS provides in-depth, production-tested education. We focus on enduring engineering fundamentals: relational databases, distributed microservices, state machines, and accessible design token systems.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+              <div className="p-4 rounded-xl bg-ivory-100/60 border border-ivory-200">
+                <h4 className="font-bold text-forest-900 text-sm">Pragmatic Pedagogy</h4>
+                <p className="text-xs text-charcoal-500 mt-1 leading-relaxed">Realistic production codebases over superficial tutorials.</p>
+              </div>
+              <div className="p-4 rounded-xl bg-ivory-100/60 border border-ivory-200">
+                <h4 className="font-bold text-forest-900 text-sm">Honors Assessment</h4>
+                <p className="text-xs text-charcoal-500 mt-1 leading-relaxed">Detailed rubric evaluations with instructor feedback.</p>
+              </div>
             </div>
+            <motion.button
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => navigateTo('about')}
+              className="px-5 py-2.5 rounded-xl border border-forest-800/20 bg-white hover:bg-ivory-100 text-forest-900 font-medium text-sm transition-colors flex items-center gap-2 group"
+            >
+              <span>Learn More About Nexus</span>
+              <ArrowRight className="w-4 h-4 text-gold-500 group-hover:translate-x-1 transition-transform" />
+            </motion.button>
+          </motion.div>
+          <motion.div variants={fadeUp} className="relative">
+            <img
+              src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80"
+              alt="Nexus Seminar"
+              className="rounded-2xl shadow-xl border border-ivory-200 w-full object-cover h-72 sm:h-96"
+            />
+          </motion.div>
+        </div>
+      </motion.section>
+
+      {/* Campus Gallery Preview */}
+      <motion.section
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24"
+      >
+        <motion.div variants={fadeUp} className="text-center space-y-2 mb-10">
+          <span className="text-xs font-bold text-gold-600 uppercase tracking-widest">Campus Life</span>
+          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-forest-950 leading-tight">Inside the Nexus Community</h2>
+          <p className="text-sm sm:text-base text-charcoal-600 max-w-2xl mx-auto leading-relaxed">
+            From capstone defenses to hackathons and honors ceremonies — a glimpse of scholarly life at Nexus.
+          </p>
+        </motion.div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {gallery.slice(0, 3).map((item) => (
+            <motion.div
+              key={item.id}
+              variants={fadeUp}
+              whileHover={{ y: -6 }}
+              onClick={() => navigateTo('gallery')}
+              className="group relative rounded-2xl overflow-hidden border border-ivory-200 shadow-sm hover:shadow-lg transition-[box-shadow,border-color] duration-300 cursor-pointer"
+            >
+              <img src={item.image} alt={item.title} className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105" />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-forest-950/90 via-forest-950/40 to-transparent p-5 pt-12">
+                <span className="text-[11px] font-bold text-gold-400 uppercase tracking-wider">{item.category}</span>
+                <h3 className="font-serif font-bold text-base text-ivory-50 leading-snug mt-1">{item.title}</h3>
+              </div>
+            </motion.div>
           ))}
         </div>
-      </section>
+        <motion.div variants={fadeUp} className="text-center mt-10">
+          <button
+            onClick={() => navigateTo('gallery')}
+            className="px-5 py-2.5 rounded-xl border border-forest-800/20 bg-white hover:bg-ivory-100 text-forest-900 font-medium text-sm transition-colors inline-flex items-center gap-2 group"
+          >
+            <span>View Campus Gallery</span>
+            <ArrowRight className="w-4 h-4 text-gold-500 group-hover:translate-x-1 transition-transform" />
+          </button>
+        </motion.div>
+      </motion.section>
+
+      {/* Placement Network */}
+      <motion.section
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="border-y border-ivory-200 bg-white py-16 lg:py-24"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          <motion.div variants={fadeUp} className="text-center space-y-2">
+            <span className="text-xs font-bold text-gold-600 uppercase tracking-widest">Placement Network</span>
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-forest-950 leading-tight">Where Our Scholars Build</h2>
+            <p className="text-sm sm:text-base text-charcoal-600 max-w-2xl mx-auto leading-relaxed">
+              Graduates join engineering teams at the world's most rigorous technology institutions.
+            </p>
+          </motion.div>
+
+          <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="p-4 rounded-xl bg-ivory-50 border border-ivory-200 text-center">
+              <p className="font-serif text-xl sm:text-2xl font-bold text-forest-900">{placements.stats.placementRate}</p>
+              <p className="text-[11px] text-charcoal-500 font-semibold uppercase tracking-wide mt-1">Placement Rate</p>
+            </div>
+            <div className="p-4 rounded-xl bg-ivory-50 border border-ivory-200 text-center">
+              <p className="font-serif text-xl sm:text-2xl font-bold text-forest-900">{placements.stats.averagePackage}</p>
+              <p className="text-[11px] text-charcoal-500 font-semibold uppercase tracking-wide mt-1">Average Package</p>
+            </div>
+            <div className="p-4 rounded-xl bg-ivory-50 border border-ivory-200 text-center">
+              <p className="font-serif text-xl sm:text-2xl font-bold text-forest-900">{placements.stats.highestPackage}</p>
+              <p className="text-[11px] text-charcoal-500 font-semibold uppercase tracking-wide mt-1">Highest Package</p>
+            </div>
+            <div className="p-4 rounded-xl bg-ivory-50 border border-ivory-200 text-center">
+              <p className="font-serif text-xl sm:text-2xl font-bold text-forest-900">{placements.stats.hiringPartnersCount}</p>
+              <p className="text-[11px] text-charcoal-500 font-semibold uppercase tracking-wide mt-1">Hiring Partners</p>
+            </div>
+            <div className="p-4 rounded-xl bg-ivory-50 border border-ivory-200 text-center col-span-2 sm:col-span-1">
+              <p className="font-serif text-xl sm:text-2xl font-bold text-forest-900">{placements.stats.placedStudentsCount}</p>
+              <p className="text-[11px] text-charcoal-500 font-semibold uppercase tracking-wide mt-1">Placed Students</p>
+            </div>
+          </motion.div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 items-center">
+            {placements.partners.map((partner) => (
+              <motion.div
+                key={partner.name}
+                variants={fadeUp}
+                whileHover={{ y: -3 }}
+                className="p-3.5 rounded-xl bg-ivory-50 border border-ivory-200 text-center hover:border-forest-300 transition-colors shadow-sm"
+              >
+                <span className="font-semibold text-xs text-charcoal-800 block truncate">{partner.logoText}</span>
+                <span className="text-[10px] text-charcoal-400 block truncate mt-0.5">{partner.role}</span>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div variants={fadeUp} className="text-center">
+            <button
+              onClick={() => navigateTo('placements')}
+              className="px-5 py-2.5 rounded-xl border border-forest-800/20 bg-white hover:bg-ivory-100 text-forest-900 font-medium text-sm transition-colors inline-flex items-center gap-2 group"
+            >
+              <span>View Placement Records</span>
+              <ArrowRight className="w-4 h-4 text-gold-500 group-hover:translate-x-1 transition-transform" />
+            </button>
+          </motion.div>
+        </div>
+      </motion.section>
+
+      {/* Admissions CTA */}
+      <motion.section
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        variants={fadeUp}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24"
+      >
+        <div className="rounded-3xl bg-forest-900 border border-forest-800 px-6 py-14 sm:px-12 lg:px-16 text-center space-y-6 shadow-xl">
+          <span className="text-xs font-bold text-gold-400 uppercase tracking-widest">Admissions Open</span>
+          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white leading-tight max-w-3xl mx-auto">
+            Begin Your Academic Journey with Nexus LMS
+          </h2>
+          <p className="text-sm sm:text-base text-ivory-300 leading-relaxed max-w-2xl mx-auto">
+            Speak with our admissions desk about cohort timelines, syllabus depth, and tuition assistance — or create your student account today.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <motion.button
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => navigateTo('contact')}
+              className="px-6 py-3 rounded-xl bg-gold-500 hover:bg-gold-400 text-charcoal-950 font-semibold text-sm shadow-md transition-colors"
+            >
+              Contact Admissions
+            </motion.button>
+            <motion.button
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => navigateTo('signup')}
+              className="px-6 py-3 rounded-xl border border-ivory-200/30 bg-transparent hover:bg-forest-800 text-ivory-100 font-medium text-sm transition-colors"
+            >
+              Create Student Account
+            </motion.button>
+          </div>
+        </div>
+      </motion.section>
     </div>
   );
 }
@@ -354,7 +590,13 @@ function PublicAbout() {
 
   return (
     <div className="space-y-16 pb-16">
-      <section className="bg-forest-900 text-ivory-100 py-16 border-b border-forest-800">
+      <motion.section
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="bg-forest-900 text-ivory-100 py-16 border-b border-forest-800"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
           <span className="text-xs font-bold text-gold-400 uppercase tracking-widest">Our Founding Mandate</span>
           <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white">About Nexus LMS</h1>
@@ -362,9 +604,15 @@ function PublicAbout() {
             Bridging theoretical computer science and high-velocity engineering reality through rigorous, project-driven academic instruction.
           </p>
         </div>
-      </section>
+      </motion.section>
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <motion.section
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+      >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-5">
             <span className="text-xs font-bold text-gold-600 uppercase tracking-wider">The Academic Philosophy</span>
@@ -393,17 +641,28 @@ function PublicAbout() {
             />
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Instructors */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <motion.section
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+      >
         <div className="text-center space-y-2 mb-10">
           <span className="text-xs font-bold text-gold-600 uppercase tracking-wider">Distinguished Faculty</span>
           <h2 className="font-serif text-2xl sm:text-3xl font-bold text-forest-950">Learn from World-Class Mentors</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {instructors.map((inst) => (
-            <div key={inst.id} className="bg-white rounded-2xl border border-ivory-200 p-5 text-center shadow-sm space-y-3">
+            <motion.div
+              key={inst.id}
+              variants={fadeUp}
+              whileHover={{ y: -4 }}
+              className="bg-white rounded-2xl border border-ivory-200 p-5 text-center shadow-sm space-y-3"
+            >
               <img src={inst.avatar} alt={inst.name} className="w-20 h-20 rounded-full mx-auto object-cover border-2 border-forest-800" />
               <div>
                 <h3 className="font-serif font-bold text-base text-charcoal-900">{inst.name}</h3>
@@ -412,10 +671,10 @@ function PublicAbout() {
               </div>
               <p className="text-xs text-charcoal-600 line-clamp-3 leading-relaxed pt-1 border-t border-ivory-100">{inst.bio}</p>
               <div className="text-xs text-forest-800 font-medium pt-2">★ {inst.rating} · {inst.studentsTaught.toLocaleString()} Students</div>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 }
@@ -435,15 +694,27 @@ function PublicCourses() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      <div className="text-center max-w-2xl mx-auto space-y-2">
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="text-center max-w-2xl mx-auto space-y-2"
+      >
         <span className="text-xs font-bold text-gold-600 uppercase tracking-widest">Academic Catalog</span>
         <h1 className="font-serif text-3xl sm:text-4xl font-bold text-forest-950">Explore All Programs</h1>
         <p className="text-xs sm:text-sm text-charcoal-600">
           Rigorous professional curriculums designed to take you from foundational concepts to production-level engineering.
         </p>
-      </div>
+      </motion.div>
 
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-ivory-200 shadow-sm">
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-ivory-200 shadow-sm"
+      >
         <div className="flex items-center gap-1.5 flex-wrap w-full md:w-auto">
           {categories.map((cat) => (
             <button
@@ -467,11 +738,22 @@ function PublicCourses() {
             className="w-full pl-9 pr-3 py-2 text-xs bg-ivory-50 border border-ivory-200 rounded-lg text-charcoal-900"
           />
         </div>
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
         {filtered.map((course) => (
-          <div key={course.id} className="group bg-white rounded-2xl border border-ivory-200 overflow-hidden shadow-sm hover:shadow-md hover:border-forest-300 transition-all flex flex-col justify-between">
+          <motion.div
+            key={course.id}
+            variants={fadeUp}
+            whileHover={{ y: -5 }}
+            className="group bg-white rounded-2xl border border-ivory-200 overflow-hidden shadow-sm hover:shadow-md hover:border-forest-300 transition-all flex flex-col justify-between"
+          >
             <div>
               <div className="relative overflow-hidden">
                 <img src={course.thumbnail} alt={course.title} className="w-full h-44 object-cover transition-transform duration-300 group-hover:scale-105" />
@@ -509,23 +791,25 @@ function PublicCourses() {
                 <span className="font-bold text-base text-forest-900">${course.price}</span>
               </div>
               <div className="flex items-center gap-2">
-                <button
+                <motion.button
                   onClick={() => navigateTo('course-overview', { courseId: course.id })}
+                  whileTap={{ scale: 0.97 }}
                   className="px-3 py-1.5 rounded-lg border border-forest-800/20 text-forest-800 hover:bg-forest-50 text-xs font-medium"
                 >
                   Syllabus
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   onClick={() => enrollCourse(course.id)}
+                  whileTap={{ scale: 0.97 }}
                   className="px-3.5 py-1.5 rounded-lg bg-forest-800 hover:bg-forest-900 text-white text-xs font-semibold shadow-sm"
                 >
                   Enroll
-                </button>
+                </motion.button>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -540,11 +824,17 @@ function PublicGallery() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      <div className="text-center max-w-2xl mx-auto space-y-2">
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="text-center max-w-2xl mx-auto space-y-2"
+      >
         <span className="text-xs font-bold text-gold-600 uppercase tracking-widest">Campus & Culture</span>
         <h1 className="font-serif text-3xl sm:text-4xl font-bold text-forest-950">Campus Gallery</h1>
         <p className="text-xs sm:text-sm text-charcoal-600">A visual look into workshops, hackathons, lab critiques, and student showcases.</p>
-      </div>
+      </motion.div>
 
       <div className="flex items-center justify-center gap-2 flex-wrap">
         {tags.map(t => (
@@ -558,9 +848,21 @@ function PublicGallery() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
         {filtered.map(item => (
-          <div key={item.id} onClick={() => setLightbox(item)} className="group cursor-pointer bg-white rounded-2xl border border-ivory-200 overflow-hidden shadow-sm hover:shadow-md hover:border-forest-300 transition-all">
+          <motion.div
+            key={item.id}
+            onClick={() => setLightbox(item)}
+            variants={fadeUp}
+            whileHover={{ y: -5 }}
+            className="group cursor-pointer bg-white rounded-2xl border border-ivory-200 overflow-hidden shadow-sm hover:shadow-md hover:border-forest-300 transition-all"
+          >
             <div className="relative h-52 overflow-hidden">
               <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
               <div className="absolute inset-0 bg-forest-950/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
@@ -577,13 +879,25 @@ function PublicGallery() {
               <h3 className="font-serif font-bold text-sm text-charcoal-900">{item.title}</h3>
               <p className="text-xs text-charcoal-500 line-clamp-2">{item.description}</p>
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {lightbox && (
-        <div onClick={() => setLightbox(null)} className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div onClick={e => e.stopPropagation()} className="bg-white rounded-2xl overflow-hidden max-w-xl w-full shadow-2xl">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
+          onClick={() => setLightbox(null)}
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-2xl overflow-hidden max-w-xl w-full shadow-2xl"
+          >
             <img src={lightbox.image} alt={lightbox.title} className="w-full h-72 object-cover" />
             <div className="p-6 space-y-2">
               <span className="text-xs text-gold-600 font-bold uppercase">{lightbox.category}</span>
@@ -593,8 +907,8 @@ function PublicGallery() {
                 <button onClick={() => setLightbox(null)} className="px-4 py-1.5 bg-forest-800 text-white text-xs font-semibold rounded-lg">Close</button>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
     </div>
   );
@@ -605,7 +919,13 @@ function PublicPlacements() {
 
   return (
     <div className="space-y-16 pb-16">
-      <section className="bg-forest-950 text-ivory-100 py-16 border-b border-forest-900">
+      <motion.section
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="bg-forest-950 text-ivory-100 py-16 border-b border-forest-900"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
           <span className="text-xs font-bold text-gold-400 uppercase tracking-widest">Career Outcomes</span>
           <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white">Graduate Placement Records</h1>
@@ -613,34 +933,51 @@ function PublicPlacements() {
             Nexus alumni join premier software engineering and design teams worldwide.
           </p>
         </div>
-      </section>
+      </motion.section>
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <motion.section
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+      >
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="p-6 rounded-2xl bg-white border border-ivory-200 text-center shadow-sm">
+          <motion.div variants={fadeUp} whileHover={{ y: -4 }} className="p-6 rounded-2xl bg-white border border-ivory-200 text-center shadow-sm">
             <h3 className="font-serif text-3xl font-bold text-forest-900">{placements.stats.placementRate}</h3>
             <p className="text-xs font-semibold text-charcoal-700 uppercase tracking-wide mt-1">Placement Rate</p>
-          </div>
-          <div className="p-6 rounded-2xl bg-white border border-ivory-200 text-center shadow-sm">
+          </motion.div>
+          <motion.div variants={fadeUp} whileHover={{ y: -4 }} className="p-6 rounded-2xl bg-white border border-ivory-200 text-center shadow-sm">
             <h3 className="font-serif text-3xl font-bold text-forest-900">{placements.stats.averagePackage}</h3>
             <p className="text-xs font-semibold text-charcoal-700 uppercase tracking-wide mt-1">Average Starting Base</p>
-          </div>
-          <div className="p-6 rounded-2xl bg-white border border-ivory-200 text-center shadow-sm">
+          </motion.div>
+          <motion.div variants={fadeUp} whileHover={{ y: -4 }} className="p-6 rounded-2xl bg-white border border-ivory-200 text-center shadow-sm">
             <h3 className="font-serif text-3xl font-bold text-forest-900">{placements.stats.highestPackage}</h3>
             <p className="text-xs font-semibold text-charcoal-700 uppercase tracking-wide mt-1">Highest Package</p>
-          </div>
-          <div className="p-6 rounded-2xl bg-white border border-ivory-200 text-center shadow-sm">
+          </motion.div>
+          <motion.div variants={fadeUp} whileHover={{ y: -4 }} className="p-6 rounded-2xl bg-white border border-ivory-200 text-center shadow-sm">
             <h3 className="font-serif text-3xl font-bold text-forest-900">{placements.stats.hiringPartnersCount}</h3>
             <p className="text-xs font-semibold text-charcoal-700 uppercase tracking-wide mt-1">Hiring Partners</p>
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      <motion.section
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6"
+      >
         <h2 className="font-serif text-2xl font-bold text-forest-950 text-center">Recent Graduate Placements</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {placements.stories.map(story => (
-            <div key={story.id} className="bg-white rounded-2xl border border-ivory-200 p-6 space-y-3 shadow-sm">
+            <motion.div
+              key={story.id}
+              variants={fadeUp}
+              whileHover={{ y: -4 }}
+              className="bg-white rounded-2xl border border-ivory-200 p-6 space-y-3 shadow-sm"
+            >
               <div className="flex items-center gap-3">
                 <img src={story.avatar} alt={story.name} className="w-12 h-12 rounded-full object-cover border border-forest-800" />
                 <div>
@@ -654,10 +991,10 @@ function PublicPlacements() {
                 <span className="font-bold text-forest-900">{story.package}</span>
               </div>
               <p className="text-xs text-charcoal-600 italic leading-relaxed">"{story.quote}"</p>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 }
@@ -679,14 +1016,26 @@ function PublicContact() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-      <div className="text-center max-w-2xl mx-auto space-y-2">
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="text-center max-w-2xl mx-auto space-y-2"
+      >
         <span className="text-xs font-bold text-gold-600 uppercase tracking-widest">Connect With Us</span>
         <h1 className="font-serif text-3xl sm:text-4xl font-bold text-forest-950">Admissions & Contact</h1>
         <p className="text-xs sm:text-sm text-charcoal-600">Have questions regarding syllabus depth, cohort timelines, or tuition assistance?</p>
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-2xl border border-ivory-200 shadow-sm space-y-5">
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="grid grid-cols-1 lg:grid-cols-12 gap-10"
+      >
+        <motion.div variants={fadeUp} className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-2xl border border-ivory-200 shadow-sm space-y-5">
           <h3 className="font-serif text-xl font-bold text-charcoal-900">Send an Inquiry</h3>
           {sent ? (
             <div className="p-6 rounded-xl bg-forest-50 border border-forest-200 text-center space-y-2">
@@ -719,12 +1068,18 @@ function PublicContact() {
                 <label className="block text-xs font-semibold text-charcoal-700 mb-1">Message *</label>
                 <textarea rows="4" required placeholder="Tell us about your background..." value={data.msg} onChange={e => setData({...data, msg: e.target.value})} className="w-full px-3.5 py-2 text-xs bg-ivory-50 border border-ivory-200 rounded-lg text-charcoal-900"></textarea>
               </div>
-              <button type="submit" className="w-full py-2.5 bg-forest-800 hover:bg-forest-900 text-white font-medium text-xs rounded-xl shadow">Submit Inquiry</button>
+              <motion.button
+                type="submit"
+                whileTap={{ scale: 0.98 }}
+                className="w-full py-2.5 bg-forest-800 hover:bg-forest-900 text-white font-medium text-xs rounded-xl shadow"
+              >
+                Submit Inquiry
+              </motion.button>
             </form>
           )}
-        </div>
+        </motion.div>
 
-        <div className="lg:col-span-5 space-y-5">
+        <motion.div variants={fadeUp} className="lg:col-span-5 space-y-5">
           <div className="bg-forest-900 text-white p-6 rounded-2xl border border-forest-800 space-y-3">
             <h4 className="font-serif text-lg font-bold text-white">Campus Center</h4>
             <div className="space-y-2 text-xs text-ivory-200">
@@ -738,8 +1093,8 @@ function PublicContact() {
             <p className="text-charcoal-600">Monday - Friday: 8:00 AM - 6:00 PM PST</p>
             <p className="text-charcoal-600">Saturday: 9:00 AM - 1:00 PM PST (Live Chat Support)</p>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

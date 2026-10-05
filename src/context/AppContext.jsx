@@ -16,10 +16,36 @@ import {
 
 const AppContext = createContext();
 
+/* ---- Browser-history helpers (hash-based routing, no router lib) ---- */
+// Read the current route from location.hash, e.g. "#/courses?courseId=cs-101"
+const readRouteFromLocation = () => {
+  if (typeof window === 'undefined') return { view: 'home', params: {} };
+  const raw = window.location.hash.replace(/^#\/?/, '');
+  if (!raw) return { view: 'home', params: {} };
+  const [path, query] = raw.split('?');
+  const view = path || 'home';
+  const params = {};
+  if (query) {
+    const sp = new URLSearchParams(query);
+    if (sp.get('courseId')) params.courseId = sp.get('courseId');
+    if (sp.get('lessonId')) params.lessonId = sp.get('lessonId');
+  }
+  return { view, params };
+};
+
+// Build a hash URL for a view + params
+const buildHash = (view, params = {}) => {
+  const sp = new URLSearchParams();
+  if (params.courseId) sp.set('courseId', params.courseId);
+  if (params.lessonId) sp.set('lessonId', params.lessonId);
+  const q = sp.toString();
+  return `#/${view}${q ? `?${q}` : ''}`;
+};
+
 export const AppProvider = ({ children }) => {
-  // Navigation & View State
-  const [currentView, setCurrentView] = useState('home');
-  const [viewParams, setViewParams] = useState({});
+  // Navigation & View State (initialised from the URL hash so refresh / direct links work)
+  const [currentView, setCurrentView] = useState(() => readRouteFromLocation().view);
+  const [viewParams, setViewParams] = useState(() => readRouteFromLocation().params);
   const [userRole, setUserRole] = useState('public'); // 'public', 'student', 'admin'
   const [activeCourseId, setActiveCourseId] = useState('cs-101');
   const [activeLessonId, setActiveLessonId] = useState('l6');
@@ -57,8 +83,36 @@ export const AppProvider = ({ children }) => {
     if (params.lessonId) {
       setActiveLessonId(params.lessonId);
     }
+    // Push a real history entry so the browser Back/Forward buttons work in-app
+    const hash = buildHash(view, params);
+    if (window.location.hash !== hash) {
+      window.history.pushState({ view, params }, '', hash);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  // Sync the initial history entry with the loaded route (refresh / direct link)
+  useEffect(() => {
+    const route = readRouteFromLocation();
+    window.history.replaceState({ view: route.view, params: route.params }, '', buildHash(route.view, route.params));
+    if (route.params.courseId) setActiveCourseId(route.params.courseId);
+    if (route.params.lessonId) setActiveLessonId(route.params.lessonId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Respond to browser Back / Forward without ever closing the app
+  useEffect(() => {
+    const onPopState = () => {
+      const route = readRouteFromLocation();
+      setCurrentView(route.view);
+      setViewParams(route.params);
+      if (route.params.courseId) setActiveCourseId(route.params.courseId);
+      if (route.params.lessonId) setActiveLessonId(route.params.lessonId);
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   // Switch demo roles seamlessly
   const switchRole = (role) => {

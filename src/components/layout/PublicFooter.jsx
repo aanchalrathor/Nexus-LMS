@@ -72,7 +72,7 @@ export const PublicFooter = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-forest-900 flex flex-col sm:flex-row items-center justify-between text-xs text-ivory-400 gap-4">
+        <div className="mt-12 pt-8 border-t border-forest-900 flex flex-col sm:flex-row items-center justify-between text-sm text-ivory-400 gap-4">
           <p>© {new Date().getFullYear()} Nexus LMS Educational Systems. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <span className="hover:text-ivory-200 cursor-pointer">Privacy Framework</span>

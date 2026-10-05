@@ -11,6 +11,16 @@
   h1, h2, h3, .font-editorial {
     letter-spacing: -0.02em;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
 }
 
 /* Custom Scrollbar */
