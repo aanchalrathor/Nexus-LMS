@@ -33,13 +33,16 @@ const readRouteFromLocation = () => {
   return { view, params };
 };
 
-// Build a hash URL for a view + params
-const buildHash = (view, params = {}) => {
+// Build a URL for a view + params. Home uses the clean root path (no hash);
+// other views keep hash routes so refresh/direct links never 404 on static hosts.
+const buildRouteUrl = (view, params = {}) => {
+  const base = window.location.pathname + window.location.search;
   const sp = new URLSearchParams();
   if (params.courseId) sp.set('courseId', params.courseId);
   if (params.lessonId) sp.set('lessonId', params.lessonId);
   const q = sp.toString();
-  return `#/${view}${q ? `?${q}` : ''}`;
+  if (view === 'home' && !q) return base;
+  return `${base}#/${view}${q ? `?${q}` : ''}`;
 };
 
 export const AppProvider = ({ children }) => {
@@ -84,9 +87,10 @@ export const AppProvider = ({ children }) => {
       setActiveLessonId(params.lessonId);
     }
     // Push a real history entry so the browser Back/Forward buttons work in-app
-    const hash = buildHash(view, params);
-    if (window.location.hash !== hash) {
-      window.history.pushState({ view, params }, '', hash);
+    const url = buildRouteUrl(view, params);
+    const currentUrl = window.location.pathname + window.location.search + window.location.hash;
+    if (currentUrl !== url) {
+      window.history.pushState({ view, params }, '', url);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -94,7 +98,7 @@ export const AppProvider = ({ children }) => {
   // Sync the initial history entry with the loaded route (refresh / direct link)
   useEffect(() => {
     const route = readRouteFromLocation();
-    window.history.replaceState({ view: route.view, params: route.params }, '', buildHash(route.view, route.params));
+    window.history.replaceState({ view: route.view, params: route.params }, '', buildRouteUrl(route.view, route.params));
     if (route.params.courseId) setActiveCourseId(route.params.courseId);
     if (route.params.lessonId) setActiveLessonId(route.params.lessonId);
     // eslint-disable-next-line react-hooks/exhaustive-deps

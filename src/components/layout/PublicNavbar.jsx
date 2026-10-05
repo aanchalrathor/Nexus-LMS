@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../../context/AppContext';
 import { GraduationCap, Menu, X, ArrowRight } from 'lucide-react';
@@ -6,6 +6,42 @@ import { GraduationCap, Menu, X, ArrowRight } from 'lucide-react';
 export const PublicNavbar = () => {
   const { currentView, navigateTo } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrollSection, setScrollSection] = useState('home');
+
+  // Scroll-spy: while on the Home landing page, track which section is in view
+  useEffect(() => {
+    if (currentView !== 'home') return undefined;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      // Sticky navbar height + breathing room so a section activates as it reaches the top
+      const offset = 96 + 40;
+      const sections = Array.from(document.querySelectorAll('[data-nav]'));
+      let active = 'home';
+      for (const el of sections) {
+        if (el.getBoundingClientRect().top <= offset) active = el.getAttribute('data-nav');
+      }
+      // At the very bottom of the page, force the final section active
+      if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4 && sections.length) {
+        active = sections[sections.length - 1].getAttribute('data-nav');
+      }
+      setScrollSection(prev => (prev === active ? prev : active));
+    };
+    const onScroll = () => {
+      if (!raf) raf = window.requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    return () => {
+      if (raf) window.cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [currentView]);
+
+  // On Home the highlight follows the scrolled section; elsewhere it follows the route
+  const activeView = currentView === 'home' ? scrollSection : currentView;
 
   const navLinks = [
     { label: 'Home', view: 'home' },
@@ -41,7 +77,7 @@ export const PublicNavbar = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => {
-              const isActive = currentView === link.view;
+              const isActive = activeView === link.view;
               return (
                 <button
                   key={link.view}
@@ -107,7 +143,7 @@ export const PublicNavbar = () => {
             className="md:hidden border-t border-ivory-200 bg-white px-4 pt-3 pb-6 space-y-2 shadow-xl overflow-hidden"
           >
             {navLinks.map((link) => {
-              const isActive = currentView === link.view;
+              const isActive = activeView === link.view;
               return (
                 <button
                   key={link.view}

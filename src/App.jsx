@@ -170,7 +170,7 @@ function PublicHome() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative overflow-hidden pt-14 pb-20 lg:pt-24 lg:pb-28 bg-gradient-to-b from-ivory-100/70 to-ivory-50 border-b border-ivory-200">
+      <section data-nav="home" className="relative overflow-hidden pt-14 pb-20 lg:pt-24 lg:pb-28 bg-gradient-to-b from-ivory-100/70 to-ivory-50 border-b border-ivory-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className={`grid grid-cols-1 items-center gap-12 lg:gap-10 ${isAuthenticated ? 'lg:grid-cols-12' : ''}`}>
             <motion.div
@@ -303,6 +303,7 @@ function PublicHome() {
         whileInView="show"
         viewport={viewportOnce}
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 lg:pb-24"
+        data-nav="courses"
       >
         <motion.div variants={fadeUp} className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
           <div className="space-y-2">
@@ -396,6 +397,7 @@ function PublicHome() {
         whileInView="show"
         viewport={viewportOnce}
         className="border-y border-ivory-200 bg-white py-16 lg:py-24"
+        data-nav="about"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <motion.div variants={fadeUp} className="space-y-6">
@@ -443,6 +445,7 @@ function PublicHome() {
         whileInView="show"
         viewport={viewportOnce}
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24"
+        data-nav="gallery"
       >
         <motion.div variants={fadeUp} className="text-center space-y-2 mb-10">
           <span className="text-xs font-bold text-gold-600 uppercase tracking-widest">Campus Life</span>
@@ -486,6 +489,7 @@ function PublicHome() {
         whileInView="show"
         viewport={viewportOnce}
         className="border-y border-ivory-200 bg-white py-16 lg:py-24"
+        data-nav="placements"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <motion.div variants={fadeUp} className="text-center space-y-2">
@@ -552,6 +556,7 @@ function PublicHome() {
         viewport={viewportOnce}
         variants={fadeUp}
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24"
+        data-nav="contact"
       >
         <div className="rounded-3xl bg-forest-900 border border-forest-800 px-6 py-14 sm:px-12 lg:px-16 text-center space-y-6 shadow-xl">
           <span className="text-xs font-bold text-gold-400 uppercase tracking-widest">Admissions Open</span>
