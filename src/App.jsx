@@ -296,13 +296,61 @@ function PublicHome() {
         </div>
       </motion.section>
 
+      {/* Academic Philosophy */}
+      <motion.section
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="border-y border-ivory-200 bg-white py-16 lg:py-24"
+        data-nav="about"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <motion.div variants={fadeUp} className="space-y-6">
+            <span className="text-xs font-bold text-gold-600 uppercase tracking-widest">The Academic Philosophy</span>
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-forest-950 leading-tight">
+              Education Grounded in Systems Architecture, Not Transient Syntax.
+            </h2>
+            <p className="text-sm sm:text-base text-charcoal-600 leading-relaxed">
+              Founded by senior engineering leaders and academic researchers, Nexus LMS provides in-depth, production-tested education. We focus on enduring engineering fundamentals: relational databases, distributed microservices, state machines, and accessible design token systems.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+              <div className="p-4 rounded-xl bg-ivory-100/60 border border-ivory-200">
+                <h4 className="font-bold text-forest-900 text-sm">Pragmatic Pedagogy</h4>
+                <p className="text-xs text-charcoal-500 mt-1 leading-relaxed">Realistic production codebases over superficial tutorials.</p>
+              </div>
+              <div className="p-4 rounded-xl bg-ivory-100/60 border border-ivory-200">
+                <h4 className="font-bold text-forest-900 text-sm">Honors Assessment</h4>
+                <p className="text-xs text-charcoal-500 mt-1 leading-relaxed">Detailed rubric evaluations with instructor feedback.</p>
+              </div>
+            </div>
+            <motion.button
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => navigateTo('about')}
+              className="px-5 py-2.5 rounded-xl border border-forest-800/20 bg-white hover:bg-ivory-100 text-forest-900 font-medium text-sm transition-colors flex items-center gap-2 group"
+            >
+              <span>Learn More About Nexus</span>
+              <ArrowRight className="w-4 h-4 text-gold-500 group-hover:translate-x-1 transition-transform" />
+            </motion.button>
+          </motion.div>
+          <motion.div variants={fadeUp} className="relative">
+            <img
+              src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80"
+              alt="Nexus Seminar"
+              className="rounded-2xl shadow-xl border border-ivory-200 w-full object-cover h-72 sm:h-96"
+            />
+          </motion.div>
+        </div>
+      </motion.section>
+
       {/* Featured Courses */}
       <motion.section
         variants={staggerContainer}
         initial="hidden"
         whileInView="show"
         viewport={viewportOnce}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 lg:pb-24"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 lg:pt-24 pb-16 lg:pb-24"
         data-nav="courses"
       >
         <motion.div variants={fadeUp} className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
@@ -387,54 +435,6 @@ function PublicHome() {
               </div>
             </motion.div>
           ))}
-        </div>
-      </motion.section>
-
-      {/* Academic Philosophy */}
-      <motion.section
-        variants={staggerContainer}
-        initial="hidden"
-        whileInView="show"
-        viewport={viewportOnce}
-        className="border-y border-ivory-200 bg-white py-16 lg:py-24"
-        data-nav="about"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          <motion.div variants={fadeUp} className="space-y-6">
-            <span className="text-xs font-bold text-gold-600 uppercase tracking-widest">The Academic Philosophy</span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-forest-950 leading-tight">
-              Education Grounded in Systems Architecture, Not Transient Syntax.
-            </h2>
-            <p className="text-sm sm:text-base text-charcoal-600 leading-relaxed">
-              Founded by senior engineering leaders and academic researchers, Nexus LMS provides in-depth, production-tested education. We focus on enduring engineering fundamentals: relational databases, distributed microservices, state machines, and accessible design token systems.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-              <div className="p-4 rounded-xl bg-ivory-100/60 border border-ivory-200">
-                <h4 className="font-bold text-forest-900 text-sm">Pragmatic Pedagogy</h4>
-                <p className="text-xs text-charcoal-500 mt-1 leading-relaxed">Realistic production codebases over superficial tutorials.</p>
-              </div>
-              <div className="p-4 rounded-xl bg-ivory-100/60 border border-ivory-200">
-                <h4 className="font-bold text-forest-900 text-sm">Honors Assessment</h4>
-                <p className="text-xs text-charcoal-500 mt-1 leading-relaxed">Detailed rubric evaluations with instructor feedback.</p>
-              </div>
-            </div>
-            <motion.button
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => navigateTo('about')}
-              className="px-5 py-2.5 rounded-xl border border-forest-800/20 bg-white hover:bg-ivory-100 text-forest-900 font-medium text-sm transition-colors flex items-center gap-2 group"
-            >
-              <span>Learn More About Nexus</span>
-              <ArrowRight className="w-4 h-4 text-gold-500 group-hover:translate-x-1 transition-transform" />
-            </motion.button>
-          </motion.div>
-          <motion.div variants={fadeUp} className="relative">
-            <img
-              src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80"
-              alt="Nexus Seminar"
-              className="rounded-2xl shadow-xl border border-ivory-200 w-full object-cover h-72 sm:h-96"
-            />
-          </motion.div>
         </div>
       </motion.section>
 
